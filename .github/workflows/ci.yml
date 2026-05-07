@@ -43,7 +43,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@1.80
-      - run: cargo test
+      # Some transitive dev-deps publish new versions that require a
+      # newer Rust than our MSRV. Pin them to the last MSRV-compatible
+      # release. A stable Rust is needed to resolve and rewrite the
+      # lockfile (so cargo can parse the latest manifests), then we
+      # build with 1.80.
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Pin MSRV-incompatible transitive deps
+        run: |
+          cargo +stable generate-lockfile
+          cargo +stable update -p clap --precise 4.5.40
+          cargo +stable update -p clap_builder --precise 4.5.40
+          cargo +stable update -p clap_lex --precise 0.7.4
+      - run: cargo +1.80 test --locked
 
   doc:
     name: Docs
