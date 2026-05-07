@@ -1,0 +1,80 @@
+[package]
+name = "ipfix-parser"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.80"
+license = "BSD-2-Clause"
+description = "High-performance, zero-copy, sans-io decoder for IPFIX (RFC 7011) messages"
+keywords = ["ipfix", "network", "parser", "rfc7011", "flow"]
+categories = ["network-programming", "parser-implementations"]
+build = "build.rs"
+include = [
+    "src/**/*.rs",
+    "build.rs",
+    "assets/iana/ipfix-information-elements.csv",
+    "assets/iana/README.md",
+    "Cargo.toml",
+    "LICENSE",
+    "README.md",
+]
+
+[features]
+std-store = ["dep:schnellru", "dep:log"]
+default = ["std-store"]
+
+# A release build geared for runtime speed. The `bench` profile inherits
+# from `release`, so criterion benches and `cargo install` consumers both
+# see these settings. See:
+# https://nnethercote.github.io/perf-book/build-configuration.html
+[profile.release]
+lto = "fat"
+codegen-units = 1
+
+[dependencies]
+schnellru = { version = "0.2", optional = true }
+log = { version = "0.4", optional = true }
+
+[build-dependencies]
+heck = "0.5"
+
+[dev-dependencies]
+criterion = { version = "0.5", default-features = false, features = ["cargo_bench_support"] }
+pcap-parser = "0.17"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["macros", "net", "rt", "rt-multi-thread", "time"] }
+
+[[example]]
+name = "udp_receiver"
+required-features = ["std-store"]
+
+[[example]]
+name = "json_collector"
+required-features = ["std-store"]
+
+[[bench]]
+name = "header_decode"
+harness = false
+
+[[bench]]
+name = "set_iter"
+harness = false
+
+[[bench]]
+name = "field_decode"
+harness = false
+
+[[bench]]
+name = "record_iter"
+harness = false
+required-features = ["std-store"]
+
+[[bench]]
+name = "message_walk"
+harness = false
+required-features = ["std-store"]
+
+[[bench]]
+name = "decode_into"
+harness = false
+required-features = ["std-store"]

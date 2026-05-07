@@ -1,0 +1,51 @@
+[package]
+name = "ipfix-parser-fuzz"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+# Declare a self-contained workspace so that this crate is never accidentally
+# merged into the parent package's workspace.
+[workspace]
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+
+[dependencies.ipfix-parser]
+path = ".."
+features = ["std-store"]
+
+# ── Fuzz targets ─────────────────────────────────────────────────────────────
+
+[[bin]]
+name = "fuzz_header"
+path = "fuzz_targets/fuzz_header.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "fuzz_set"
+path = "fuzz_targets/fuzz_set.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "fuzz_template"
+path = "fuzz_targets/fuzz_template.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "fuzz_record"
+path = "fuzz_targets/fuzz_record.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "fuzz_field"
+path = "fuzz_targets/fuzz_field.rs"
+test = false
+doc = false
